@@ -1,0 +1,2 @@
+web1 ansible_host=3.81.19.57 ansible_user=ubuntu  ansible_ssh_private_key_file=~/joaquim-labsg-key.pem
+
