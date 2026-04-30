@@ -1,0 +1,23 @@
+
+PLAY [Manage Multiple Packages on Servers] *************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [web1]
+
+TASK [Install multiple packages] ***********************************************
+ok: [web1] => (item=apache2)
+ok: [web1] => (item=nginx)
+
+TASK [Configure Nginx config file] *********************************************
+changed: [web1]
+
+TASK [Start multiple services] *************************************************
+ok: [web1] => (item=apache2)
+changed: [web1] => (item=nginx)
+
+RUNNING HANDLER [restart nginx] ************************************************
+changed: [web1]
+
+PLAY RECAP *********************************************************************
+web1                       : ok=5    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

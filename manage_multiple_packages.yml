@@ -1,0 +1,46 @@
+- name: Manage Multiple Packages on Servers
+  hosts: all
+  become: yes
+  vars:
+    package_list:
+      - apache2
+      - nginx #both packages listen to same port so i need to change ports in one of them
+  tasks:
+    - name: Install multiple packages
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: true
+      loop: "{{ package_list }}"
+
+    - name: Configure Nginx config file
+      copy:  #tried with lineinfile + path+regex+line but i coulnd replace the exact line https://docs.ansible.com/projects/ansible/latest/collections/ansible/builtin/lineinfile_module.html
+        dest: /etc/nginx/sites-available/default # configuration for nginx ports 
+        content: | # copy collection replaces all in file in the dest: with the contect in content:
+          server {
+                  listen 8080 default_server;
+                  listen [::]:8080 default_server;
+
+                  root /var/www/html;
+                  index index.html index.htm index.nginx-debian.html;
+
+                  server_name _;
+
+                  location / {
+                          try_files $uri $uri/ =404;
+                  }
+          }
+      notify: restart nginx # a "taks" to be done after in handlers https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_handlers.html#naming-handlers
+
+    - name: Start multiple services
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop: "{{ package_list }}"
+
+  handlers: #restart nginx to impose new port
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted

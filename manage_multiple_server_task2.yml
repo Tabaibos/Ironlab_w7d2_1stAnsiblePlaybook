@@ -1,0 +1,22 @@
+- name: Manage Services on Multiple Servers
+  hosts: all
+  become: yes
+  vars:
+    package_dict:
+      webserver: apache2
+      db_lib: libmariadb-dev # library for maria db in ubuntu
+    service_dict:
+      webserver: apache2
+  tasks:
+    - name: Install multiple packages from dictionary
+      ansible.builtin.package:
+        name: "{{ item.value }}"
+        state: present
+      loop: "{{ package_dict | dict2items }}"
+
+    - name: Start multiple services from dictionary
+      ansible.builtin.service:
+        name: "{{ item.value }}"
+        state: started
+        enabled: yes
+      loop: "{{ service_dict | dict2items }}"
